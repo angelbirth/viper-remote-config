@@ -15,16 +15,20 @@ func init() {
 }
 
 type MysqlRemoteConfigFactory struct {
+	db *sql.DB
 	KeyFieldName,
 	ValueFieldName string
 }
 
 func (p MysqlRemoteConfigFactory) Get(rp viper.RemoteProvider) (io.Reader, error) {
-	db, err := sql.Open(rp.Provider(), rp.Endpoint())
-	if err != nil {
-		return nil, err
+	var err error
+	if p.db == nil {
+		p.db, err = sql.Open(rp.Provider(), rp.Endpoint())
+		if err != nil {
+			return nil, err
+		}
 	}
-	rows, err := db.Query(fmt.Sprintf(`select %s,%s from %s`, p.KeyFieldName, p.ValueFieldName, rp.Path()))
+	rows, err := p.db.Query(fmt.Sprintf(`select %s,%s from %s`, p.KeyFieldName, p.ValueFieldName, rp.Path()))
 	if err != nil {
 		return nil, err
 	}
@@ -49,11 +53,14 @@ func (p MysqlRemoteConfigFactory) Get(rp viper.RemoteProvider) (io.Reader, error
 }
 
 func (p MysqlRemoteConfigFactory) Watch(rp viper.RemoteProvider) (io.Reader, error) {
-	db, err := sql.Open(rp.Provider(), rp.Endpoint())
-	if err != nil {
-		return nil, err
+	var err error
+	if p.db == nil {
+		p.db, err = sql.Open(rp.Provider(), rp.Endpoint())
+		if err != nil {
+			return nil, err
+		}
 	}
-	rows, err := db.Query(fmt.Sprintf(`select %s,%s from %s`, p.KeyFieldName, p.ValueFieldName, rp.Path()))
+	rows, err := p.db.Query(fmt.Sprintf(`select %s,%s from %s`, p.KeyFieldName, p.ValueFieldName, rp.Path()))
 	if err != nil {
 		return nil, err
 	}
