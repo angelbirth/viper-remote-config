@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -42,14 +43,12 @@ func (p MysqlRemoteConfigFactory) Get(rp viper.RemoteProvider) (io.Reader, error
 		}
 		configs[key] = value
 	}
-	reader, writer := io.Pipe()
-	encoder := json.NewEncoder(writer)
-	encoder.SetIndent("", "")
-	err = encoder.Encode(configs)
+	bytez, err := json.Marshal(configs)
 	if err != nil {
 		return nil, err
 	}
-	return reader, nil
+	buffer := bytes.NewBuffer(bytez)
+	return buffer, nil
 }
 
 func (p MysqlRemoteConfigFactory) Watch(rp viper.RemoteProvider) (io.Reader, error) {
