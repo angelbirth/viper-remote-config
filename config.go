@@ -8,7 +8,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
-	_ "github.com/spf13/viper/remote"
 )
 
 func init() {
