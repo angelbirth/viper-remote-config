@@ -25,6 +25,7 @@ func (p MysqlRemoteConfigFactory) Get(rp viper.RemoteProvider) (io.Reader, error
 	var err error
 	if p.db == nil {
 		p.db, err = sql.Open(rp.Provider(), rp.Endpoint())
+		defer p.db.Close()
 		if err != nil {
 			return nil, err
 		}
